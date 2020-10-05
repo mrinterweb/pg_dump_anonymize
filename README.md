@@ -1,8 +1,6 @@
 # PgDumpAnonymize
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/pg_dump_anonymize`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Anonymizing pg_dump data isn't always straight forward. This tool helps. It has no dependencies, other than ruby. Another good thing is that sensitive data doesn't need to ever be stored temporarily as this can be used with Unix pipes and the data is passed through as IO data.
 
 ## Installation
 
@@ -22,13 +20,59 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Example usage:
+
+```
+pg_dump --no-privileges --no-owner <database-name> | pg_dump_anonymize -d sample_definition.rb > anonymized_dump.sql
+```
+
+### Definition File
+
+The definition file is any ruby code you'd like, but it should return a hash with table names as the top level keys and attribute names nested under the table keys. Any faking ruby gems dependencies, and other gem dependencies you may choose to use in your definitions, are gems that will need to be available on the server this is ran on.
+
+Example:
+
+```ruby
+{
+  table_1: {
+    sensitive_field_1: 'some string value',
+    sensitive_field_2: -> { rand(100) },
+  },
+  table_2: {
+    sensitive_field_3: nil
+  }
+}
+```
+
+Here is a more concrete example using the [faker gem](https://github.com/faker-ruby/faker).
+
+```ruby
+require 'faker'
+
+{
+  users: {
+    first_name: -> { Faker::Name.first_name },
+    last_name: -> { Faker::Name.last_name },
+    email: -> { Faker::Internet.email },
+    city: -> 'Portland'
+  },
+  accounts: {
+    bank_name: -> { Faker::Bank.name },
+    account_num: -> { Faker::Bank.account_number },
+    routing_num: -> { Faker::Bank.routing_number }
+  }
+}
+```
 
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+
+## Performance
+
+This has been tested with a 1GB dump file, and it took 11 seconds on a 2013 MacBook Pro to anonymize it. It largely depends on how much you're anonymizing, and the anonymizing definitions you're applying. So milage will vary. Still, this is plenty fast for most of my needs.
 
 ## Contributing
 
