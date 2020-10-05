@@ -6,7 +6,7 @@ require 'optparse'
 
 options = {}
 OptionParser.new do |opts|
-  opts.banner = "Usage: #{__FILE__} [options]"
+  opts.banner = "Usage: #{File.basename(__FILE__)} [options]"
 
   opts.on('-d', '--definition DEFINITION_FILE', 'Definition file to read. This is required') do |v|
     options[:definition_file_path] = v
