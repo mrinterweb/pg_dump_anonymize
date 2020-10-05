@@ -1,0 +1,34 @@
+#!/usr/bin/env ruby
+
+require 'pg_dump_anonymize'
+require 'optparse'
+
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: #{__FILE__} [options]"
+
+  opts.on('-d', '--definition DEFINITION_FILE', 'Definition file to read. This is required') do |v|
+    options[:definition_file_path] = v
+  end
+
+  opts.on('-f', '--file OUTPUT_FILE', 'Output file') do |v|
+    options[:output_file_path] = v
+  end
+end.parse!
+
+def_file = options[:definition_file_path]
+
+unless def_file && File.exist?(def_file)
+  puts 'Definition file not found'
+  puts 'See usage with --help'
+  exit 1
+end
+
+output_file = options[:output_file_path]
+output = if output_file
+           File.open(output_file, 'w')
+         else
+           STDOUT
+         end
+
+PgDumpAnonymize.anonymize(def_file, STDIN, output)
