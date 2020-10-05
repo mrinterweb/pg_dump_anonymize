@@ -1,6 +1,8 @@
-# PgDumpAnonymize
+# pg_dump_anonymize
 
 Anonymizing pg_dump data isn't always straight forward. This tool helps. It has no dependencies, other than ruby. Another good thing is that sensitive data doesn't need to ever be stored temporarily as this can be used with Unix pipes and the data is passed through as IO data.
+
+`pg_dump_anonymize` does not anonymize any data automatically. It is very much BYOAD (Bring Your Own Anonymizing Definition). Inside your anonymizing definition, you can use any ruby gems you like, such as [faker](https://github.com/faker-ruby/faker). This gem makes applying anonymizing definitions to `pg_dump` output easy.
 
 ## Installation
 
@@ -20,6 +22,8 @@ Or install it yourself as:
 
 ## Usage
 
+`pg_dump_anonymize` does not p
+
 Example usage:
 
 ```
@@ -28,7 +32,7 @@ pg_dump --no-privileges --no-owner <database-name> | pg_dump_anonymize -d sample
 
 ### Definition File
 
-The definition file is any ruby code you'd like, but it should return a hash with table names as the top level keys and attribute names nested under the table keys. Any faking ruby gems dependencies, and other gem dependencies you may choose to use in your definitions, are gems that will need to be available on the server this is ran on.
+The definition file is any ruby code you'd like, but it must return a hash with table names as the top level keys and attribute names nested under the table keys. Any faking ruby gems dependencies, and other gem dependencies you may choose to use in your definitions, are gems that will need to be available on the server this is ran on.
 
 Example:
 
@@ -63,6 +67,9 @@ require 'faker'
   }
 }
 ```
+
+## Todo
+- [ ] Write some tests (so far this has been tested manually)
 
 ## Development
 
