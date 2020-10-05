@@ -22,7 +22,7 @@ Or install it yourself as:
 
 ## Usage
 
-`pg_dump_anonymize` does not p
+`pg_dump_anonymize` does not anonymize any data by default. You must provide your own anonymizing definition. The gem currently requires the format of output `pg_dump` is plain text (not compressed) and uses the default `COPY` behavior instead of `INSERT INTO`.
 
 Example usage:
 
