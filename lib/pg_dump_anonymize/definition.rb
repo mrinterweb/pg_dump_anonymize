@@ -27,9 +27,13 @@ module PgDumpAnonymize
     # This assumes the line is a tab delimited data line
     def anonymize_line(line)
       values = line.split("\t")
+      row_context = {} # used to share state for a row
       @positional_substitutions.each do |index, val_def|
-        anonymous_value = val_def.is_a?(Proc) ? val_def.call : val_def
-        values[index] = anonymous_value
+        values[index] = if val_def.is_a?(Proc)
+                          val_def.call(*[values[index], row_context].slice(0, val_def.arity))
+                        else
+                          val_def
+                        end
       end
       values.join("\t")
     end
