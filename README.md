@@ -30,6 +30,8 @@ Example usage:
 pg_dump --no-privileges --no-owner <database-name> | pg_dump_anonymize -d sample_definition.rb > anonymized_dump.sql
 ```
 
+You can also pipe the anonymized SQL directly into `psql` to avoid intermediate SQL dump files.
+
 ### Definition File
 
 The definition file is any ruby code you'd like, but it must return a hash with table names as the top level keys and attribute names nested under the table keys. Any faking ruby gems dependencies, and other gem dependencies you may choose to use in your definitions, are gems that will need to be available on the server this is ran on.
@@ -41,6 +43,14 @@ Example:
   table_1: {
     sensitive_field_1: 'some string value',
     sensitive_field_2: -> { rand(100) },
+    sensitive_field_3: -> (original_value, row_context) do
+      if original_value
+        'xxxxx'
+      end.tap { |new_val| row_context[field_3_val] = new_val }
+    end
+    sensitive_field_4: -> (_original_value, row_context) do
+      row_context[:field_3_val] ? 'foo' : 'bar'
+    end
   },
   table_2: {
     sensitive_field_3: nil
