@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    pg_dump_anonymize (0.1.0)
+    pg_dump_anonymize (0.1.1)
 
 GEM
   remote: https://rubygems.org/
