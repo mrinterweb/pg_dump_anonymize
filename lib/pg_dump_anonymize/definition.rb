@@ -13,10 +13,12 @@ module PgDumpAnonymize
       if @current_table
         if end_stdin?(line)
           clear_current_table
+        elsif skip?(line)
+          # do nothing
+        elsif delete?(line)
+          line = ''
         else
-          unless skip_if(line)
-            line = anonymize_line(line)
-          end
+          line = anonymize_line(line)
         end
       else
         process_copy_line(line)
@@ -38,9 +40,7 @@ module PgDumpAnonymize
                         end
 
         # Postgres represents nil/null as '\N' in SQL dumps
-        if values[index].nil?
-          values[index] = '\N'
-        end
+        values[index] = '\N' if values[index].nil?
       end
       values.join("\t")
     end
@@ -86,16 +86,16 @@ module PgDumpAnonymize
       @positional_substitutions = nil
     end
 
-    def skip_if(row)
-      if skip_if = @attribute_rules.dig(@current_table, :_skip_if)
+    def skip?(row)
+      if (skip_if = @attribute_rules.dig(@current_table, :_skip_if))
         !!skip_if.call(row_to_hash(row))
       else
         false
       end
     end
 
-    def delete_if(row)
-      if delete_if = @attribute_rules.dig(@current_table, :_delete_if)
+    def delete?(row)
+      if (delete_if = @attribute_rules.dig(@current_table, :_delete_if))
         !!delete_if.call(row_to_hash(row))
       else
         false
@@ -105,7 +105,7 @@ module PgDumpAnonymize
     def row_to_hash(row)
       return nil unless @fields
 
-      values = row.kind_of?(String) ? row.split("\t") : row
+      values = row.is_a?(String) ? row.split("\t") : row
 
       begin
         Hash[*@fields.zip(values).flatten]
