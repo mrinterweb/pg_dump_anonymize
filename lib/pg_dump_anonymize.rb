@@ -11,7 +11,7 @@ module PgDumpAnonymize
     definitions = Definition.new(definitions_hash)
 
     input_io.each_line do |line|
-      output_io.write definitions.process_line(line)
+      output_io.puts definitions.process_line(line)
     end
   end
 end
