@@ -1,5 +1,7 @@
 require "bundler/setup"
 require "pg_dump_anonymize"
+require "tempfile"
+require "securerandom"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure
