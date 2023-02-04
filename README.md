@@ -47,7 +47,7 @@ Example:
       if original_value
         'xxxxx'
       end.tap { |new_val| row_context[field_3_val] = new_val }
-    end
+    end,
     sensitive_field_4: -> (_original_value, row_context) do
       row_context[:field_3_val] ? 'foo' : 'bar'
     end
